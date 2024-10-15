@@ -1,46 +1,29 @@
-let symbolTab ={};
+// Symbol Table (Pass 1)
+let symbolTable = {};
+
+// Memory to store variable values
 let memory = {};
 
+// Opcodes for instruction set
 const opcodes = {
-    'LDA': '01',   
-    'ADD': '02',   
-    'STA': '03',   
-    'HLT': 'FF',   
-    'DB': ''       
+    'LDA': '01',   // Load Accumulator
+    'ADD': '02',   // Add to Accumulator
+    'STA': '03',   // Store Accumulator
+    'HLT': 'FF',   // Halt
+    'DB': ''       // Define Byte (handled as data)
 };
-// read the file from button
-const fileinput=document.querySelector("#textarea1");
-const fileoutput = document.querySelector("#textarea2");
-const button1 = document.querySelector("#button1");
-button1.addEventListener('click',(e)=>{
-     document.querySelector("#output").innerHTML="1";
-    const file=fileinput.files[0];
-    if(file){
-        const reader =new FileReader();
-        reader.onload=function(e){
-            const filecontent=e.target.result;
-            fileoutput.value=filecontent;
-            processAssemblyCode(filecontent);
-        };
-        reader.readAsText(file);
-    }
-    else {
-        fileoutput.value="no file selected";
-    }
 
-});
 // Function to process assembly code
 function processAssemblyCode(assemblyCode) {
-    symbolTab= {};
+    symbolTable = {};
     memory = {};
 
     // Run Pass 1 and Pass 2
     pass1(assemblyCode);
-
     pass2(assemblyCode);
 
     // Output the results to the HTML page
-    document.getElementById('output').innerText = `Symbol Table (Pass 1):\n${JSON.stringify(symbolTab, null, 2)}\n\nMemory:\n${JSON.stringify(memory, null, 2)}`;
+    document.getElementById('output').innerText = `Symbol Table (Pass 1):\n${JSON.stringify(symbolTable, null, 2)}\n\nMemory:\n${JSON.stringify(memory, null, 2)}`;
 }
 
 // Pass 1: Build symbol table
@@ -55,7 +38,7 @@ function pass1(assemblyCode) {
             const parts = cleanLine.split(/\s+/);
             if (parts[0].endsWith(':')) {
                 const label = parts[0].slice(0, -1);
-                symbolTab[label] = address;
+                symbolTable[label] = address;
             }
             
             // Check if it's an instruction (not DB)
@@ -67,7 +50,7 @@ function pass1(assemblyCode) {
         }
     });
 
-    console.log("Symbol Table (Pass 1):", symbolTab);
+    console.log("Symbol Table (Pass 1):", symbolTable);
 }
 
 // Pass 2: Generate machine code
@@ -81,8 +64,8 @@ function pass2(assemblyCode) {
             const parts = cleanLine.split(/\s+/);
             if (opcodes[parts[0]] !== undefined) {  // If it's an instruction
                 machineCode.push(opcodes[parts[0]]);
-                if (symbolTab[parts[1]]) {
-                    machineCode.push(symbolTab[parts[1]].toString(16).padStart(2, '0'));
+                if (symbolTable[parts[1]]) {
+                    machineCode.push(symbolTable[parts[1]].toString(16).padStart(2, '0'));
                 }
             } else if (parts[1] === 'DB') {  // Handle data
                 memory[parts[0].slice(0, -1)] = parseInt(parts[2], 10);
