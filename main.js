@@ -1,115 +1,120 @@
-let symbolTab ={};
-let memory = {};
 
-const opcodes = {
-    'LDA': '01',   
-    'ADD': '02',   
-    'STA': '03',   
-    'HLT': 'FF',   
-    'DB': ''       
-};
-// read the file from button
-const fileinput=document.querySelector("#textarea1");
-const fileoutput = document.querySelector("#textarea2");
 const button1 = document.querySelector("#button1");
-button1.addEventListener('click',(e)=>{
-     document.querySelector("#output").innerHTML="1";
-    const file=fileinput.files[0];
-    if(file){
-        const reader =new FileReader();
-        reader.onload=function(e){
-            const filecontent=e.target.result;
-            fileoutput.value=filecontent;
-            processAssemblyCode(filecontent);
-        };
-        reader.readAsText(file);
-    }
-    else {
-        fileoutput.value="no file selected";
-    }
 
-});
-// Function to process assembly code
-function processAssemblyCode(assemblyCode) {
-    symbolTab= {};
-    memory = {};
-
-    // Run Pass 1 and Pass 2
-    pass1(assemblyCode);
-
-    pass2(assemblyCode);
-
-    // Output the results to the HTML page
-    document.getElementById('output').innerText = `Symbol Table (Pass 1):\n${JSON.stringify(symbolTab, null, 2)}\n\nMemory:\n${JSON.stringify(memory, null, 2)}`;
-}
-
-// Pass 1: Build symbol table
-function pass1(assemblyCode) {
-    let address = 0;
-    const lines = assemblyCode.split('\n');
-
-    lines.forEach((line) => {
-        let cleanLine = line.trim();
-        if (cleanLine) {
-            // Split label and instruction
-            const parts = cleanLine.split(/\s+/);
-            if (parts[0].endsWith(':')) {
-                const label = parts[0].slice(0, -1);
-                symbolTab[label] = address;
-            }
-            
-            // Check if it's an instruction (not DB)
-            if (opcodes[parts[1]] !== undefined) {
-                address += 1;
-            } else if (parts[1] === 'DB') {
-                address += 1;
-            }
-        }
-    });
-
-    console.log("Symbol Table (Pass 1):", symbolTab);
-}
-
-// Pass 2: Generate machine code
-function pass2(assemblyCode) {
-    let machineCode = [];
-    const lines = assemblyCode.split('\n');
-
-    lines.forEach((line) => {
-        let cleanLine = line.trim();
-        if (cleanLine) {
-            const parts = cleanLine.split(/\s+/);
-            if (opcodes[parts[0]] !== undefined) {  // If it's an instruction
-                machineCode.push(opcodes[parts[0]]);
-                if (symbolTab[parts[1]]) {
-                    machineCode.push(symbolTab[parts[1]].toString(16).padStart(2, '0'));
-                }
-            } else if (parts[1] === 'DB') {  // Handle data
-                memory[parts[0].slice(0, -1)] = parseInt(parts[2], 10);
-            }
-        }
-    });
-
-    console.log("Machine Code (Pass 2):", machineCode.join(' '));
-    console.log("Memory:", memory);
-
-    // Append machine code to the output
-    const outputElem = document.getElementById('output');
-    outputElem.innerText += `\n\nMachine Code (Pass 2):\n${machineCode.join(' ')}`;
-}
-
-// Function to read the file
-function handleFileSelect(event) {
-    const file = event.target.files[0];
-    if (file) {
+function readFile(file) {
+    return new Promise((resolve, reject) => {
         const reader = new FileReader();
-        reader.onload = function(e) {
-            const assemblyCode = e.target.result;
-            processAssemblyCode(assemblyCode);
-        };
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
         reader.readAsText(file);
+    });
+}
+button1.addEventListener('click',processFiles);
+
+async function processFiles()
+ {
+    const inputFile = document.querySelector("#inputFile").file[0];
+    const optabFile = document.querySelector("#optabFile").file[0];
+    if(!inputFile || !optabFile)
+    {
+        document.querySelector("#output").textContent="error proccessing the files...";
+
+    };
+    try
+    {
+        // read the file 
+        const inputcontent = await readFile(inputFile);
+        const optabcontent = await readFile(optabFile);
+        //pass 1 and pass 2
+        const output=pass1andpass2(inputcontent,optabcontent)
+        //output
+        document.querySelector("#output").textContent=output;
+
+    }
+    catch(err)
+    {
+        console.error(err);
+        document.querySelector("#output").textContent="error loading the files...";
     }
 }
 
-// Add event listener to the file input
-document.getElementById('fileInput').addEventListener('change', handleFileSelect);
+
+function pass1andpass2(inputcontent,optabcontent)
+{
+    const optab={};
+    optabcontent.split('\n').forEach(line => {
+        const [menomonic,opcode] = line.trim().split(/\s+/);
+        if(opcode && menomonic){
+            optab[menomonic]=opcode;
+        }
+    });
+    const lines=inputcontent.split('\n')
+    const symtab={};
+    let locationcounter=0;
+    const startingaddress=parseInt(lines[0].split(/\s+/)[2],16);
+    locationcounter=startingaddress;
+
+    const intermediateCode=[];
+    const parts=lines.trim().split(/\s+/);
+
+    if(parts.length ==4)
+    {
+        const [address,label,instruction,operand]= parts;
+    
+        if(label!='_')
+        {
+            symtab[label]=locationcounter.toString(16).toUpperCase;
+        }
+        intermediateCode.push({address,instruction,operand})
+        if(optab[instruction])
+        {
+            locationcounter=locationcounter+3;
+        }
+        else if(optab[instruction]='BYTE')
+        {
+            locationcounter+=operand.length - 3;
+        }
+        else if(optab[instruction]='WORD')
+        {
+            locationcounter+=3;
+        }
+        else if(optab[instruction]='RESB')
+        {
+            locationcounter+=parseInt(operand);
+        }
+        else if(optab[instruction]='RESW')
+        {
+            locationcounter+=3 * parseInt(operand);
+        }
+        
+    }
+    //pass[2]
+    let mcode='pass 2: \n';
+    intermediateCode.forEach(line=>
+    { 
+        const {address,instruction,operand}=line;
+        let opcode = optab[instruction] || '';
+        let operandaddress =  symtab[operand] ||operand ||'';
+
+        if (instruction === 'BYTE') {
+            const byteValue = operand.slice(2, -1); // Extract byte content
+            mcode += `${address} ${byteValue}\n`;
+        } else if (instruction === 'WORD') {
+            const wordValue = parseInt(operand, 10).toString(16).padStart(6, '0').toUpperCase();
+            mcode += `${address} ${wordValue}\n`;
+        } else if (opcode) {
+            mcode += `${address} ${opcode} ${operandaddress}\n`;
+        }
+
+    } );
+
+    let output='Pass 1 Symbol Table:\n';
+    for(const [label,address] of Object.entries(symtab) )
+    {
+        output+=`${label}: ${address}\n`;
+    }
+
+     output += '\n' + mcode;
+    return output;
+
+}

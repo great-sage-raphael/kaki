@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Two Pass Assembler</title>
     <link rel="stylesheet" href="style.css"/>
-    <script src="main.js"></script>
+    
 </head>
 
 <body>
@@ -23,12 +23,18 @@
             <textarea id="textarea2"placeholder="your op code will be displayed here---"></textarea>
 
         </div>
+       <div style="padding: 10px; display: flex; gap: 20px; ">
+         <input type="file" accept=".txt" id="inputFile">
+        <input type="file" accept=".txt" id="optabFile">
+        </div>
         <div class="buttonfirst">
-            <input type="file"> <button id="button1">load</button>
+             <button id="button1">load</button>
         </div>
         
     </div>
-    <div id="output"style="margin-top: 20px;"> </div>
+    <div id="output" style="margin-top: 20px; background: radial-gradient(rgb(75, 75, 98) rgb(45, 74, 81) rgb(38, 54, 76) );padding: 20px; white-space: pre-wrappre-wrap; color: white;">
+     
+    </div>
 
 <!--output division
 <div>
@@ -52,7 +58,7 @@
         </div>
     </div>
 </div>
---> 
+--> <script src="main.js"></script>
 </body>
 
 </html>
