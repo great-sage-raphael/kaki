@@ -12,35 +12,60 @@
 <nav class="navbar">
     <div id="head">
         <div id="name">
-            <h1 id="abc"> Two Pass Assembler</h1>
+            <h1 id="abc">Two Pass Assembler</h1>
         </div>
     </div>       
 </nav>
-
-<div id="entery"> 
-    <label style="padding: 10px; text-align: center; display: block; font-family: Courier, monospace;">
-        ENTER ASSEMBLY CODE
-    </label>
-    
-    <div class="assembly">  
-        <textarea id="textarea1" placeholder="enter your code----"></textarea>
-        <textarea id="textarea2" placeholder="your op code will be displayed here---"></textarea>
-    </div>
-   
-    <div style="padding: 10px; display: flex; gap: 20px;">
-        <input type="file" accept=".txt" id="inputFile">
-        <input type="file" accept=".txt" id="optabFile">
-    </div>
-   
-    <div class="buttonfirst">
-        <button id="button1">Load</button>
+<div id="main">
+    <div id="entery"> 
+        <label style="padding: 10px; text-align: center; display: block; font-family: Courier, monospace;">
+            ENTER ASSEMBLY CODE
+        </label>
+        
+        <div class="assembly">  
+            <textarea id="textarea1" placeholder="Enter your code here..."></textarea>
+            <textarea id="textarea2" placeholder="Your op code will be displayed here..."></textarea>
+        </div>
+       
+        <div id="choosefile">
+            <div id="c1">
+                <input type="file" accept=".txt" id="inputFile" placeholder="Input File">
+            </div>
+            
+            <div id="c1">
+                <input type="file" accept=".txt" id="optabFile" placeholder="Optab File">
+            </div>
+           
+        </div>
+       
+        <div class="buttonfirst">
+            <button id="button1">Process Files</button>
+        </div>
     </div>
 </div>
 
-<div id="output" style="margin-top: 20px;border-radius: 20px; background: linear-gradient(rgb(4, 4, 46), rgb(5, 31, 37), rgb(10, 39, 79)); padding: 20px; white-space: pre-wrap; color: white;">
+
+<div id="container">
+    <div id="output">
+        <div id="pass1Output" >
+            <div id="ppass">
+                <h2>Pass 1 - Symbol Table</h2>
+            </div>
+           
+            <pre id="symbolTable"></pre>
+        </div>
+        <div id="pass2Output">
+            <div id="ppass">
+                <h2>Pass 2 - Machine Code</h2>
+            </div>
+            
+            <pre id="machineCode"></pre>
+        </div>
+    </div>
 </div>
 
-<script src="n.js"></script>
+
+<script src="main.js"></script>
 
 </body>
 </html>
