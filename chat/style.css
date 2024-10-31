@@ -7,7 +7,7 @@ body {
   }
   #head{
     font-family: Cambria, Cochin,  'Times New Roman', serif;
-    background:linear-gradient(to left,rgb(71, 71, 108) ,rgb(70, 103, 106));
+    background:linear-gradient(to left,rgb(75, 67, 42) ,rgb(129, 177, 17));
     text-align: center;
     padding: 5px;
     border-radius: 18px;
@@ -24,7 +24,7 @@ body {
     border-radius: 20px;
     text-align: auto;
     width: 90%;
-    background:linear-gradient(to left,rgb(120, 120, 202) ,rgb(17, 163, 177))
+    background:linear-gradient(to left,rgb(202, 183, 120) ,rgb(129, 177, 17));
   }
   .navbar{
     padding: 1px;
@@ -95,7 +95,7 @@ body {
     width: auto;
     padding: 10px;
     border-radius:18px ;
-    background:linear-gradient(to left,rgb(120, 120, 202) ,rgb(17, 163, 177));
+    background:linear-gradient(to left,rgb(202, 183, 120) ,rgb(129, 177, 17));
     margin: auto;
   }
   
@@ -105,7 +105,7 @@ body {
     justify-content: space-between;
     margin-top: 20px;
      border-radius: 20px;
-     background:linear-gradient(to left,rgb(120, 120, 202) ,rgb(17, 163, 177));
+     background:linear-gradient(to left,rgb(202, 183, 120) ,rgb(129, 177, 17));
      padding: 20px;
       color: rgb(60, 60, 60);
     width: 90%;
@@ -166,22 +166,4 @@ body {
    border-color: #1c1b1b;
    border-radius: 20px;
  
-}
-#footerdiv {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  padding:0;
-  padding-top: 10px;
-}
-
-#footer {
-  background: linear-gradient(to left, rgb(120, 120, 202), rgb(17, 163, 177));
-  border-radius: 20px;
-  padding: 10px;
-  text-align: center;
-  width: 90%;
-  max-width: 600px;
-  color: #333;
-  font-size: 0.9em;
 }

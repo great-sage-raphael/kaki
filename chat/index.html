@@ -1,138 +1,71 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Two-Pass Assembler</title>
+    <title>Two Pass Assembler</title>
+    <link rel="stylesheet" href="style.css"/>
 </head>
+
 <body>
+<nav class="navbar">
+    <div id="head">
+        <div id="name">
+            <h1 id="abc">Two Pass Assembler</h1>
+        </div>
+    </div>       
+</nav>
+<div id="main">
+    <div id="entery"> 
+        <label style="padding: 10px; text-align: center; display: block; font-family: Courier, monospace;">
+            ENTER ASSEMBLY CODE
+        </label>
+        
+        <div class="assembly">  
+            <textarea id="textarea1" placeholder="Enter your code here..."></textarea>
+            <textarea id="textarea2" placeholder="Your op code will be displayed here..."></textarea>
+        </div>
+       
+        <div id="choosefile">
+            <div id="c1">
+                <input type="file" accept=".txt" id="inputFile" placeholder="Input File">
+            </div>
+            
+            <div id="c1">
+                <input type="file" accept=".txt" id="optabFile" placeholder="Optab File">
+            </div>
+           
+        </div>
+       
+        <div class="buttonfirst">
+            <button id="button1">Process Files</button>
+        </div>
+    </div>
+</div>
 
-<!-- Input and Output Elements -->
-<input type="file" id="inputFile" accept=".txt">
-<input type="file" id="optabFile" accept=".txt">
-<button id="processButton">Process Files</button>
 
-<!-- Output Div -->
-<div id="output" style="white-space: pre-wrap; margin-top: 20px;"></div>
+<div id="container">
+    <div id="output">
+        <div id="pass1Output" >
+            <div id="ppass">
+                <h2>Pass 1 - Symbol Table</h2>
+            </div>
+           
+            <pre id="symbolTable"></pre>
+        </div>
+        <div id="pass2Output">
+            <div id="ppass">
+                <h2>Pass 2 - Machine Code</h2>
+            </div>
+            
+            <pre id="machineCode"></pre>
+        </div>
+    </div>
+</div>
 
-<script>
-// Function to read file content
-function readFile(file) {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = reject;
-        reader.readAsText(file);
-    });
-}
 
-// Main function to process input and optab files
-async function processFiles() {
-    const inputFile = document.getElementById('inputFile').files[0];
-    const optabFile = document.getElementById('optabFile').files[0];
-
-    if (!inputFile || !optabFile) {
-        document.getElementById('output').textContent = 'Please upload both input and optab files!';
-        return;
-    }
-
-    try {
-        // Reading file contents
-        const inputContent = await readFile(inputFile);
-        const optabContent = await readFile(optabFile);
-
-        // Process Pass 1 and Pass 2
-        const output = runPass1AndPass2(inputContent, optabContent);
-
-        // Display output
-        document.getElementById('output').textContent = output;
-
-    } catch (err) {
-        console.error('Error reading files:', err);
-        document.getElementById('output').textContent = 'Error processing files!';
-    }
-}
-
-// Function to run Pass 1 and Pass 2
-function runPass1AndPass2(inputContent, optabContent) {
-    // Parse OPTAB into a dictionary
-    const optab = {};
-    optabContent.split('\n').forEach(line => {
-        const [mnemonic, opcode] = line.trim().split(/\s+/);
-        if (mnemonic && opcode) {
-            optab[mnemonic] = opcode;
-        }
-    });
-
-    // Initialize variables for Pass 1
-    const lines = inputContent.split('\n');
-    const symbolTable = {};
-    let locationCounter = 0;
-    const startAddress = parseInt(lines[0].split(/\s+/)[2], 16); // Get the start address from 'START'
-    locationCounter = startAddress;
-
-    // Pass 1: Build symbol table and track addresses
-    const intermediateCode = [];
-    lines.forEach(line => {
-        const parts = line.trim().split(/\s+/);
-
-        if (parts.length === 4) {
-            const [address, label, instruction, operand] = parts;
-
-            // Handle labels
-            if (label !== '-') {
-                symbolTable[label] = locationCounter.toString(16).toUpperCase();
-            }
-
-            // Add to intermediate code (address, instruction, operand)
-            intermediateCode.push({ address, instruction, operand });
-
-            // Update location counter based on the instruction type
-            if (optab[instruction]) {
-                locationCounter += 3; // Assume 3 bytes for instructions
-            } else if (instruction === 'BYTE') {
-                locationCounter += operand.length - 3; // For BYTE
-            } else if (instruction === 'WORD') {
-                locationCounter += 3;
-            } else if (instruction === 'RESB') {
-                locationCounter += parseInt(operand, 10);
-            } else if (instruction === 'RESW') {
-                locationCounter += 3 * parseInt(operand, 10);
-            }
-        }
-    });
-
-    // Pass 2: Generate machine code using OPTAB and symbol table
-    let machineCode = 'Pass 2 Output:\n';
-    intermediateCode.forEach(line => {
-        const { address, instruction, operand } = line;
-        let opcode = optab[instruction] || '';
-        let operandAddress = symbolTable[operand] || operand || '';
-
-        if (instruction === 'BYTE') {
-            const byteValue = operand.slice(2, -1); // Extract byte content
-            machineCode += `${address} ${byteValue}\n`;
-        } else if (instruction === 'WORD') {
-            const wordValue = parseInt(operand, 10).toString(16).padStart(6, '0').toUpperCase();
-            machineCode += `${address} ${wordValue}\n`;
-        } else if (opcode) {
-            machineCode += `${address} ${opcode} ${operandAddress}\n`;
-        }
-    });
-
-    // Output symbol table and machine code
-    let output = 'Pass 1 Symbol Table:\n';
-    for (const [label, address] of Object.entries(symbolTable)) {
-        output += `${label}: ${address}\n`;
-    }
-
-    output += '\n' + machineCode;
-    return output;
-}
-
-// Add event listener to process button
-document.getElementById('processButton').addEventListener('click', processFiles);
-</script>
+<script src="main.js"></script>
 
 </body>
 </html>
