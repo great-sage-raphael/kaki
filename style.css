@@ -189,7 +189,7 @@ body {
       flex-direction: column;
       align-items: center;
       justify-content: center;
-
+      width: 100%;
   }
 
   #textarea1, #textarea2 {
