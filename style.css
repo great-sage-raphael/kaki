@@ -189,6 +189,7 @@ body {
       flex-direction: column;
       align-items: center;
       justify-content: center;
+
   }
 
   #textarea1, #textarea2 {
@@ -198,6 +199,7 @@ body {
   .assembly {
       flex-direction: column;
       align-items: center;
+      width: 100%;
   }
 
   #button1 {
